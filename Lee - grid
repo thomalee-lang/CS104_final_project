@@ -1,4 +1,74 @@
+Grid grid;
 
+void setup() {
+  size(720, 720);
+  strokeWeight(2); 
+  grid = new Grid();
+}
+
+void draw() {
+  background(0);
+  grid.display();
+}
+
+public class Grid {
+  private float w; // Width/Height of each square block
+  private int cols = 10;
+  private int rows = 20;
+
+  public Grid() {
+     
+    
+    w = height / 22; // Using 22 to leave not much padding top/bottom
+  }
+
+  public void display() {
+    stroke(155);
+    noFill();
+    
+    // Calculate an offset to center the grid horizontally
+    float xOffset = (width - (cols * w)) / 2;
+    float yOffset = (height - (rows * w)) / 2;
+
+    // Vertical Lines
+    for (int i = 0; i <= cols; i++) {
+      line(xOffset + i * w, yOffset, xOffset + i * w, yOffset + rows * w);
+    }
+
+    //  Horizontal Lines
+    for (int j = 0; j <= rows; j++) {
+      line(xOffset, yOffset + j * w, xOffset + cols * w, yOffset + j * w);
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/ code below is a reference from previous project
 void drawGrid() {
   for (int i = 0; i<20; i++) {
     for (int j = 0; j<10; j++) {
