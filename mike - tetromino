@@ -2,11 +2,11 @@ class Tetromino{
   int[][] piece;
   int x, y;
   int size = 35;
+  int speed = 5;
   
   Tetromino(int[][] piece, int x, int y, color c){
     this.piece = piece;
-    this.x = x;
-    this.y = y;
+    this.y = speed;
   }
 
 void move(int xPos, int yPos){
