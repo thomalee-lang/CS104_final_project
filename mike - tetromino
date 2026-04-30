@@ -2,15 +2,14 @@ class Tetromino{
   int[][] piece;
   int x, y;
   int size = 35;
-  int speed = 5;
-  
+
   Tetromino(int[][] piece, int y){
     this.piece = piece;
     this.y = y;
   }
 
 void move(){
-    y += speed;
+    y += size;
   }
 
 void rotation(){
