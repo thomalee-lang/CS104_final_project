@@ -4,7 +4,7 @@ class Tetromino{
   int size = 35;
   int speed = 5;
   
-  Tetromino(int[][] piece, int x, int y, color c){
+  Tetromino(int[][] piece, int y){
     this.piece = piece;
     this.y = y;
   }
