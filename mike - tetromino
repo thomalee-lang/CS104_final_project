@@ -6,12 +6,11 @@ class Tetromino{
   
   Tetromino(int[][] piece, int x, int y, color c){
     this.piece = piece;
-    this.y = speed;
+    this.y = y;
   }
 
-void move(int xPos, int yPos){
-    x += xPos;
-    y += xPos;
+void move(){
+    y += speed;
   }
 
 void rotation(){
