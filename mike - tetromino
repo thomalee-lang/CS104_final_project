@@ -8,4 +8,15 @@ class Tetromino{
     this.x = x;
     this.y = y;
   }
-} 
+
+void move(int xPos, int yPos){
+    x += xPos;
+    y += xPos;
+  }
+
+void rotation(){
+  int rows = piece.length;
+  int cols = piece[0].length;
+  int[][] rotated = new int[cols][rows];
+  }
+}
