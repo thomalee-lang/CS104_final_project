@@ -1,1 +1,13 @@
-
+class Tetromino{
+  int[][] piece;
+  int x, y;
+  color c;
+  int size = 35;
+  
+  Tetromino(int[][] piece, int x, int y, color c){
+    this.piece = piece;
+    this.x = x;
+    this.y = y;
+    this.c = c;
+  }
+} 
