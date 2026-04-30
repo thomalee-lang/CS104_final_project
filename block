@@ -1,13 +1,1 @@
-class Block{
-  int iGrid;
-  int jGrid;
-  color hue;
-  Block(int iGrid, int jGrid, color hue){
-    this.iGrid = iGrid;
-    this.jGrid = jGrid;
-    this.hue = hue;
-  }
-  void render(){
-     square(iGrid, jGrid, hue);
-  }
-}
+
