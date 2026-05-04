@@ -3,7 +3,7 @@ class Block {
   int lastIndex;
 
   //Pieces Design
-  static int[][][] shapes = {
+  int[][][] shapes = {
     { {1,1,1}, {0,1,0} }, //T
     { {1,1,1,1} }, //I
     { {1,1}, {1,1} }, // Square
@@ -13,7 +13,7 @@ class Block {
     { {0,1,1}, {1,1,0} } // Z
   };
 
-  static color[] Colors = {
+  color[] Colors = {
     color(140,25,180), //T color
     color(30,230,220), //I color
     color(245,230,65), // square color
