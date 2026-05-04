@@ -1,6 +1,7 @@
 class Block {
   int size = 35;
-  
+  int lastIndex;
+
   //Pieces Design
   static int[][][] shapes = {
     { {1,1,1}, {0,1,0} }, //T
