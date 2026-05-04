@@ -11,3 +11,13 @@ class Block {
     { {1,1,0}, {0,1,1} }, //S
     { {0,1,1}, {1,1,0} } // Z
   };
+
+  static color[] Colors = {
+    color(140,25,180), //T color
+    color(30,230,220), //I color
+    color(245,230,65), // square color
+    color(20,95,245), //L color
+    color(245,150,20), //J color
+    color(235, 50, 20), //Z color
+    color(60,235,20) //S color
+  };
