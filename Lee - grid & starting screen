@@ -1,0 +1,133 @@
+Grid grid;
+boolean gameStarted = false; // Tracks if we are at the menu or in the game
+
+void setup() {
+  size(720, 720);
+  strokeWeight(2); 
+  grid = new Grid(); // Initialize the game grid
+}
+
+void draw() {
+  background(0); // Clear screen every frame
+  
+  // Decide which screen to show based on game state
+  if (gameStarted == false) {
+    showStartScreen();
+  } else {
+    grid.display();
+  }
+}
+
+// Function to draw the intro menu
+void showStartScreen() {
+  textAlign(CENTER);
+  rectMode(CENTER);
+  
+  // Display the main title
+  fill(255);
+  textSize(90);
+  text("TETRIS", width/2, height/2 - 150);
+  
+  // Draw the blue logo circle
+  stroke(0, 0, 255); 
+  strokeWeight(5); 
+  fill(0); 
+  ellipse(width/2, height/2 - 10, 480, 200); 
+  
+  // Display the team name inside the circle
+  noStroke(); 
+  fill(255);
+  textSize(30);
+  text("TEAM", width/2, height/2 - 45); 
+  
+  textSize(60);
+  text("MALfunction", width/2, height/2 + 30);
+  
+  // Tell the player how to start
+  strokeWeight(2); 
+  fill(150);
+  textSize(20);
+  text("Press 'S' to Start", width/2, height/2 + 160);
+}
+
+// Handles user input
+void keyPressed() {
+  // Start the game when 'S' is pressed
+  if (key == 's' || key == 'S') {
+    gameStarted = true;
+  }
+}
+
+// Class to handle the background play area
+public class Grid {
+  private float w; // Size of each individual cell
+  private int cols = 10;
+  private int rows = 20;
+
+  public Grid() {
+    w = height / 22; // Scale grid to fit the screen height
+  }
+
+  public void display() {
+    stroke(155);
+    noFill();
+    
+    // Calculate centering offsets
+    float xOffset = (width - (cols * w)) / 2;
+    float yOffset = (height - (rows * w)) / 2;
+
+    // Draw the vertical grid lines
+    for (int i = 0; i <= cols; i++) {
+      line(xOffset + i * w, yOffset, xOffset + i * w, yOffset + rows * w);
+    }
+
+    // Draw the horizontal grid lines
+    for (int j = 0; j <= rows; j++) {
+      line(xOffset, yOffset + j * w, xOffset + cols * w, yOffset + j * w);
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/ code below is a reference from previous project
+void drawGrid() {
+  for (int i = 0; i<20; i++) {
+    for (int j = 0; j<10; j++) {
+      if (grid[i][j] == -1) {
+        fill(220, 90, 60);
+      }
+      if (grid[i][j] == 0) {
+        fill(255);
+      }
+      if (grid[i][j] >= 1) {
+        fill(70, 200, 105);
+      }
+      square(175+35*j, 70+35*i, 35);
+    }
+  }
+}
