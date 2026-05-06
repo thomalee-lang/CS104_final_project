@@ -36,6 +36,18 @@ void draw() {
     grid.display();
     b1.render();
     b1.update(t);
+    
+    textAlign(LEFT);
+    fill(255);
+    textSize(24);
+    text("SCORE", 50, 100);
+    textSize(40);
+    text(totalPoints, 50, 140);
+    
+    textSize(20);
+    fill(180);
+    text("LINES: " + linesGone, 50, 200);
+    text("SPEED: " + (55 - currentSpeed)/5, 50, 230); // Display a "Level"
   }
 }
 
@@ -234,6 +246,9 @@ class Tetromino {
     if (!canMove(xTopLeftI, yTopLeftI)) {
       screen = 0; subScreen = 0; currentSpeed = 50; linesGone = 0;
       for(int i=0; i<20; i++) for(int j=0;j<10; j++) grid.board[i][j]=0;
+      totalPoints = 0;      // Move these inside here!
+      linesGone = 0;
+      currentSpeed = 50;
     }
   }
   void rotation() {
@@ -242,15 +257,29 @@ class Tetromino {
     if (canMove(xTopLeftI, yTopLeftI, rotated)) piece = rotated;
   }
   void clearLines() {
+    int linesThisTurn = 0;
     for(int r = 19; r>=0; r--) {
       boolean full = true;
       for(int c=0; c<10; c++) if (grid.board[r][c] == 0) full = false;
       if (full) {
+        linesThisTurn++;
         for (int moveR = r; moveR > 0; moveR--) for (int c = 0; c < 10; c++) grid.board[moveR][c] = grid.board[moveR-1][c];
         for (int c = 0; c < 10; c++) grid.board[0][c] = 0;
         r++; linesGone++;
         if (linesGone % 3 == 0) currentSpeed = max(5, currentSpeed - 5);
       }
     }
+      if (linesThisTurn > 0) {
+        linesGone += linesThisTurn/2;
+        if (linesThisTurn == 1) totalPoints += 100;
+        else if (linesThisTurn == 2) totalPoints += 300;
+        else if (linesThisTurn == 3) totalPoints += 500;
+        else if (linesThisTurn >= 4) totalPoints += 800; // The classic "Tetris" bonus
+
+    // Increase difficulty: every 5 lines, make the game faster
+    // (A lower speed value means the piece moves down more often)
+        currentSpeed = max(10, 50 - (linesGone / 5) * 5); 
+        this.speed = currentSpeed;
+      }
   }
 }
