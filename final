@@ -186,7 +186,7 @@ void showStartScreen() {
 }
 
 
-// determines logic of ho w the pieces move
+// determines logic of how the pieces move
 class Tetromino {
   int[][] piece;
   int xTopLeftI, yTopLeftI;
@@ -203,30 +203,15 @@ class Tetromino {
   }
   
   void moveLeft() {
-    int firstCol = piece[0].length; // Start with max possible
-    for (int i = 0; i < piece.length; i++) {
-      for (int j = 0; j < piece[i].length; j++) {
-        if (piece[i][j] == 1) {
-          firstCol = min(firstCol, j);
-        }
-      }
-    }
-    // Allow move only if the leftmost '1' hasn't reached grid column 0
-    if (xTopLeftI + firstCol > 0) {
+    // Just check if moving left by 1 is a valid move
+    if (canMove(xTopLeftI - 1, yTopLeftI)) {
       xTopLeftI--;
     }
   }
 
   void moveRight() {
-    int lastCol = 0;
-    for (int i = 0; i < piece.length; i++) {
-      for (int j = 0; j < piece[i].length; j++) {
-        if (piece[i][j] == 1) {
-          lastCol = max(lastCol, j);
-        }
-      }
-    }
-    if (xTopLeftI + lastCol < 9) {
+    // Just check if moving right by 1 is a valid move
+    if (canMove(xTopLeftI + 1, yTopLeftI)) {
       xTopLeftI++;
     }
   }
@@ -242,14 +227,19 @@ class Tetromino {
     }
   }
   
-  // Helper to check if a move is valid
+  // Helper to check if a move is valid (defaults to the current piece)
   boolean canMove(int newX, int newY) {
-    for (int r = 0; r < piece.length; r++) {
-      for (int c = 0; c < piece[r].length; c++) {
-        if (piece[r][c] == 1) {
+    return canMove(newX, newY, this.piece);
+  }
+  
+  // Advanced helper that can test any matrix (useful for rotations)
+  boolean canMove(int newX, int newY, int[][] toTest) {
+    for (int r = 0; r < toTest.length; r++) {
+      for (int c = 0; c < toTest[r].length; c++) {
+        if (toTest[r][c] == 1) {
           int nextX = newX + c;
           int nextY = newY + r;
-          // Check boundaries and landed blocks
+          // Check boundaries AND landed blocks
           if (nextX < 0 || nextX >= 10 || nextY >= 20 || (nextY >= 0 && grid.board[nextY][nextX] != 0)) {
             return false;
           }
@@ -289,12 +279,18 @@ class Tetromino {
   void rotation() {
     rows = piece.length;
     cols = piece[0].length;
-    rotated = new int[piece[0].length][piece.length];
+    rotated = new int[cols][rows];
+    
+    // Generate the rotated array
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         rotated[c][rows - 1 - r] = piece[r][c];
       }
     }
-    piece = rotated;
+    
+    // ONLY apply the rotation if the newly rotated shape fits on the board
+    if (canMove(xTopLeftI, yTopLeftI, rotated)) {
+      piece = rotated;
+    }
   }
 }
