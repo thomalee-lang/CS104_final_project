@@ -153,37 +153,38 @@ class Grid {
   }
 }
 
-// Function to draw the intro menu
-void showStartScreen() {
-  textAlign(CENTER);
-  rectMode(CENTER);
-
-  // Display the main title
-  fill(255);
-  textSize(90);
-  text("TETRIS", width/2, height/2 - 150);
-
-  // Draw the blue logo circle
-  stroke(0, 0, 255);
-  strokeWeight(5);
-  fill(0);
-  ellipse(width/2, height/2 - 10, 480, 200);
-
-  // Display the team name inside the circle
-  noStroke();
-  fill(255);
-  textSize(30);
-  text("TEAM", width/2, height/2 - 45);
-
-  textSize(60);
-  text("MALfunction", width/2, height/2 + 30);
-
-  // Tell the player how to start
-  strokeWeight(2);
-  fill(150);
-  textSize(20);
-  text("Press 'S' to Start", width/2, height/2 + 160);
-}
+  // Function to draw the intro menu
+  void showStartScreen() {
+    textAlign(CENTER);
+    rectMode(CENTER);
+  
+    // Display the main title
+    background(0);
+    fill(255);
+    textSize(90);
+    text("TETRIS", width/2, height/2 - 150);
+  
+    // Draw the blue logo circle
+    stroke(0, 0, 255);
+    strokeWeight(5);
+    fill(0);
+    ellipse(width/2, height/2 - 10, 480, 200);
+  
+    // Display the team name inside the circle
+    noStroke();
+    fill(255);
+    textSize(30);
+    text("TEAM", width/2, height/2 - 45);
+  
+    textSize(60);
+    text("MALfunction", width/2, height/2 + 30);
+  
+    // Tell the player how to start
+    strokeWeight(2);
+    fill(150);
+    textSize(20);
+    text("Press 'S' to Start", width/2, height/2 + 160);
+  }
 
 
 // determines logic of how the pieces move
@@ -239,8 +240,13 @@ class Tetromino {
           int nextX = newX + c;
           int nextY = newY + r;
           // Check boundaries AND landed blocks
-          if (nextX < 0 || nextX >= 10 || nextY >= 20 || (nextY >= 0 && grid.board[nextY][nextX] != 0)) {
+          if (nextX < 0 || nextX >= 10 || nextY >= 20) {
             return false;
+          }
+          if (nextY >= 0) { 
+            if (grid.board[nextY][nextX] != 0){
+              return false;
+            }
           }
         }
       }
@@ -264,10 +270,10 @@ class Tetromino {
   }
   
   void spawnNewPiece() {
-    b1 = new Block(int(random(7)), 3, 0); // New random shape
+    b1 = new Block(int(random(7)), 3, -1); // New random shape
     this.piece = b1.shapes[b1.shape];
     this.xTopLeftI = 3;
-    this.yTopLeftI = 0;
+    this.yTopLeftI = -1;
     
     // Game Over check: if new piece immediately collides
     if (!canMove(xTopLeftI, yTopLeftI)) {
