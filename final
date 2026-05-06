@@ -5,6 +5,7 @@ int screen;
 Tetromino t;
 int totalPoints;
 int linesGone;
+int currentSpeed;
 
 void setup() {
   size(720, 720);
@@ -13,6 +14,7 @@ void setup() {
   b1 = new Block(int(random(7)), 3, 0);
   t = new Tetromino(b1.shapes[b1.shape], b1.xIndex, b1.yIndex);
   screen = 0;
+  currentSpeed = 50;
 }
 
 void draw() {
@@ -38,7 +40,7 @@ void keyPressed() {
       t.rotation();
     }
     if (keyCode==DOWN) {
-      t.speed=7;
+      t.speed=5;
     }
     if (keyCode==LEFT) {
       t.moveLeft();
@@ -46,17 +48,19 @@ void keyPressed() {
     if (keyCode==RIGHT) {
       t.moveRight();
     }
+    if(key == ' '){
+      t.hardDrop();
+    }
   }
 }
 
 void keyReleased() {
   if (screen==1) {
-    if (keyCode == DOWN) {
-      t.speed=50;
+    if (keyCode == DOWN || key == ' ') {
+      t.speed=currentSpeed;
     }
   }
 }
-
 
 class Block {
   int size;
@@ -229,6 +233,13 @@ class Tetromino {
       }
     }
   }
+  
+  void hardDrop() {
+    while (canMove(xTopLeftI, yTopLeftI + 1)) {
+      yTopLeftI++;
+    }
+    lockPiece();
+  }
 
   boolean canMove(int newX, int newY) {
     return canMove(newX, newY, this.piece);
@@ -280,7 +291,13 @@ class Tetromino {
     
     // Game Over check: if new piece immediately collides
     if (!canMove(xTopLeftI, yTopLeftI)) {
-      screen = 0; // Return to start screen
+      screen = 0;
+      //reset board
+      for(int i=0; i<20; i++){
+        for(int j=0;j<10; j++){
+          grid.board[i][j]=0;
+        }
+      }
     }
   }
 
@@ -312,17 +329,16 @@ class Tetromino {
       }
       
       if (full) {
-        // Shift everything above this row down by one
+        // Shifts everything above this row down by one
         for (int moveR = r; moveR > 0; moveR--) {
           for (int c = 0; c < 10; c++) {
             grid.board[moveR][c] = grid.board[moveR-1][c];
           }
         }
-        // Make the very top row empty
+        // Makes the very top row empty
         for (int c = 0; c < 10; c++) {
           grid.board[0][c] = 0;
         }
-        // Re-check the same row index because a new row just moved into it
         r++; 
       }
     }
