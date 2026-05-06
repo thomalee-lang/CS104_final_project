@@ -1,13 +1,13 @@
 //global variables
 Grid grid;
 Block b1;
-int screen;
 Tetromino t;
-int totalPoints;
-int linesGone;
+int screen;
 //represents the block moving down every # of currentSpeed frames
 //higher currentSpeed is  lower speed
 int currentSpeed;
+int totalPoints;
+int linesGone;
 int introOpacity;
 
 
@@ -23,6 +23,7 @@ void setup() {
   introOpacity = 0;
 }
 
+//displays each screen and then the game
 void draw() {
   if (screen == 0) {
     playTeamAnimation();
@@ -55,7 +56,7 @@ void draw() {
   }
 }
  
-
+//user input
 void keyPressed() {
   if(screen == 1 && key == 's'){
     screen = 2;
@@ -83,6 +84,7 @@ void keyPressed() {
   }
 }
 
+//used to set speed back to current speed after hard/soft drop
 void keyReleased() {
   if (screen==3) {
     if (keyCode == DOWN || key == ' ') {
@@ -91,6 +93,7 @@ void keyReleased() {
   }
 }
 
+//intro team animation
 void playTeamAnimation(){
   background(0);
   noStroke();
@@ -108,11 +111,13 @@ void playTeamAnimation(){
   text("MALfunction", width/2, height/2 + 100);
   
   introOpacity += 2;
+  //once done loading, goes to game screen
   if (introOpacity > 350) {
     screen = 1;
   }
 }
 
+//game starting screen
 void showStartScreen() {
   background(0);
   textAlign(CENTER);
@@ -134,6 +139,7 @@ void showStartScreen() {
   strokeWeight(2);
 }
 
+//instructionScreen
 void showObjectiveScreen() {
   background(0);
   textAlign(CENTER);
@@ -157,6 +163,7 @@ void showObjectiveScreen() {
   text("Press 'S' to Start Playing", width/2, height/2 + 200);
 }
 
+//block class
 class Block {
   int size;
   int shape;
@@ -165,7 +172,7 @@ class Block {
   int xIndex;
   int yIndex;
 
-  //Pieces Design
+  //piece design
   int[][][] shapes = {
     { {1, 1, 1}, {0, 1, 0} }, //T
     { {1, 1, 1, 1} }, //I
@@ -176,6 +183,7 @@ class Block {
     { {0, 1, 1}, {1, 1, 0} } // Z
   };
 
+  //colors for each piece
   color[] colors = {
     color(140, 25, 180), //T color
     color(30, 230, 220), //I color
@@ -193,6 +201,7 @@ class Block {
     this.yIndex = yIndex;
   }
 
+  //renders a square for shapes array where a 1 is present to build block
   void render() {
     xPos = 200 + xIndex*size;
     yPos = 40 + yIndex*size;
@@ -201,12 +210,12 @@ class Block {
         if (shapes[shape][i][j] == 1) {
           fill(colors[shape]);
           square(j*size + xPos, i*size + yPos, size);
-        } else if (shapes[shape][i][j] == 0) {
         }
       }
     }
   }
 
+  //updates block movement and all variables associated with position
   void update(Tetromino t) {
     t.moveDown();
     this.xIndex = t.xTopLeftI;
@@ -215,9 +224,9 @@ class Block {
   }
 }
 
-
+//grid class (playing board)
 class Grid {
-  int w; // Width/Height of each square block
+  int w; // width of each square
   int cols = 10;
   int rows = 20;
   int xOffset;
@@ -225,29 +234,31 @@ class Grid {
   int board[][] = new int[20][10];
 
   Grid() {
-    w = height / 22; // Using 22 to leave not much padding top/bottom
-    // Calculate an offset to center the grid horizontally
+    w = height / 22;
+    // calculates an offset to center the grid horizontally
     xOffset = (width - (cols * w)) / 2;
     yOffset = (height - (rows * w)) / 2;
   }
 
+  //displays grid
   void display() {
     stroke(155);
     noFill();
-    // Vertical Lines
+    // vertical Lines
     for (int i = 0; i <= cols; i++) {
-      line(xOffset + i * w, yOffset, xOffset + i * w, yOffset + rows * w);
+      line(xOffset + i*w, yOffset, xOffset + i*w, yOffset + rows*w);
     }
-    //  Horizontal Lines
+    //  horizontal Lines
     for (int j = 0; j <= rows; j++) {
-      line(xOffset, yOffset + j * w, xOffset + cols * w, yOffset + j * w);
+      line(xOffset, yOffset + j*w, xOffset + cols*w, yOffset + j*w);
     }
-   
+    
+    //displays the landed blocks on the board
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         if (board[r][c] != 0) {
-          fill(b1.colors[board[r][c]-1]); // Use colors from Block class
-          square(xOffset + c * w, yOffset + r * w, w);
+          fill(b1.colors[board[r][c]-1]);
+          square(xOffset + c*w, yOffset + r*w, w);
         }
       }
     }
@@ -258,7 +269,7 @@ class Grid {
 class Tetromino {
   int[][] piece;
   int xTopLeftI, yTopLeftI;
-  int speed = 50; //moves every 50 frames
+  int speed = 50; //block moves down every 50 frames
   boolean collision;
   int rows;
   int cols;
@@ -270,57 +281,24 @@ class Tetromino {
     this.yTopLeftI = yTopLeftI;
   }
   
-  void moveLeft() {
-    // Just check if moving left by 1 is a valid move
-    if (canMove(xTopLeftI - 1, yTopLeftI)) {
-      xTopLeftI--;
-    }
-  }
-
-  void moveRight() {
-    // Just check if moving right by 1 is a valid move
-    if (canMove(xTopLeftI + 1, yTopLeftI)) {
-      xTopLeftI++;
-    }
-  }
-
-  void moveDown() {
-    int time = (frameCount % speed);
-    if (time == 0) {
-      if (canMove(xTopLeftI, yTopLeftI + 1)) {
-        yTopLeftI += 1;
-      } else {
-        lockPiece(); // Piece has hit something; stop and stack it
-      }
-    }
-  }
-  
-  void hardDrop() {
-    while (canMove(xTopLeftI, yTopLeftI + 1)) {
-      yTopLeftI++;
-    }
-    lockPiece();
-  }
-
+  //checks if an object can move
   boolean canMove(int newX, int newY) {
     return canMove(newX, newY, this.piece);
   }
   
-  // Advanced helper that can test any matrix (useful for rotations)
+  //more advanced helper that can test any matrix (useful for rotations)
   boolean canMove(int newX, int newY, int[][] toTest) {
     for (int r = 0; r < toTest.length; r++) {
       for (int c = 0; c < toTest[r].length; c++) {
         if (toTest[r][c] == 1) {
           int nextX = newX + c;
           int nextY = newY + r;
-          // Check boundaries AND landed blocks
+          //checks all boundaries as well as landed blocks
           if (nextX < 0 || nextX >= 10 || nextY >= 20) {
             return false;
           }
-          if (nextY >= 0) { 
-            if (grid.board[nextY][nextX] != 0){
+          if (nextY >= 0 && grid.board[nextY][nextX] != 0) { 
               return false;
-            }
           }
         }
       }
@@ -328,43 +306,34 @@ class Tetromino {
     return true;
   }
   
-  void lockPiece() {
-    for (int r = 0; r < piece.length; r++) {
-      for (int c = 0; c < piece[r].length; c++) {
-        if (piece[r][c] == 1) {
-          int gridX = xTopLeftI + c;
-          int gridY = yTopLeftI + r;
-          if (gridY >= 0) {
-            grid.board[gridY][gridX] = b1.shape + 1; // Store current color
-          }
-        }
-      }
-    }
-    clearLines();
-    spawnNewPiece();
-  }
-  
-  void spawnNewPiece() {
-    b1 = new Block(int(random(7)), 3, -1); // New random shape
-    this.piece = b1.shapes[b1.shape];
-    this.xTopLeftI = 3;
-    this.yTopLeftI = -1;
-    
-    // Game Over check: if new piece immediately collides
-    if (canMove(xTopLeftI, yTopLeftI)==false) {
-      screen = 1;
-      //reset board
-      for(int i=0; i<20; i++){
-        for(int j=0;j<10; j++){
-          grid.board[i][j]=0;
-        }
-      }
-      totalPoints = 0;
-      currentSpeed = 50;
-      linesGone = 0;
+  void moveLeft() {
+    // checks if moving left is valid
+    if (canMove(xTopLeftI - 1, yTopLeftI)) {
+      xTopLeftI--;
     }
   }
 
+  void moveRight() {
+    // checks if moving right is valid
+    if (canMove(xTopLeftI + 1, yTopLeftI)) {
+      xTopLeftI++;
+    }
+  }
+
+  void moveDown() {
+    //uses frameCount module so block moves in intervals (this is where currentSpeed comes in)
+    int time = (frameCount % speed);
+    if (time == 0) {
+      if (canMove(xTopLeftI, yTopLeftI + 1)) {
+        yTopLeftI += 1;
+      } else {
+        //piece hit something so it stops
+        lockPiece();
+      }
+    }
+  }
+  
+    //rotates the block
   void rotation() {
     rows = piece.length;
     cols = piece[0].length;
@@ -377,12 +346,60 @@ class Tetromino {
       }
     }
     
-    // ONLY apply the rotation if the newly rotated shape fits on the board
+    //only applys the rotation if the newly rotated shape fits on the board
     if (canMove(xTopLeftI, yTopLeftI, rotated)) {
       piece = rotated;
     }
   }
   
+  //piece drops all the way down until hits something
+  void hardDrop() {
+    while (canMove(xTopLeftI, yTopLeftI + 1)) {
+      yTopLeftI++;
+    }
+    lockPiece();
+  }
+
+  //locks a piece in its position after it hits something
+  void lockPiece() {
+    for (int r = 0; r < piece.length; r++) {
+      for (int c = 0; c < piece[r].length; c++) {
+        if (piece[r][c] == 1) {
+          int gridX = xTopLeftI + c;
+          int gridY = yTopLeftI + r;
+          if (gridY >= 0) {
+            grid.board[gridY][gridX] = b1.shape + 1; //stores current color
+          }
+        }
+      }
+    }
+    clearLines();
+    spawnNewPiece();
+  }
+  
+  //spawns a new piece
+  void spawnNewPiece() {
+    b1 = new Block(int(random(7)), 3, -1); // New random shape
+    this.piece = b1.shapes[b1.shape];
+    this.xTopLeftI = 3;
+    this.yTopLeftI = -1;
+    
+    //checks for game over at the top of the board
+    if (canMove(xTopLeftI, yTopLeftI)==false) {
+      screen = 1;
+      //reset board and variables
+      for(int i=0; i<20; i++){
+        for(int j=0;j<10; j++){
+          grid.board[i][j]=0;
+        }
+      }
+      totalPoints = 0;
+      currentSpeed = 50;
+      linesGone = 0;
+    }
+  }
+  
+  //clears lines
   void clearLines(){
     int linesThisTurn = 0;
     for(int r = 19; r>=0; r--){
@@ -401,7 +418,7 @@ class Tetromino {
             grid.board[moveR][c] = grid.board[moveR-1][c];
           }
         }
-        // Makes the very top row empty
+        // resets board and variables
         for (int c = 0; c < 10; c++) {
           grid.board[0][c] = 0;
         }
@@ -409,6 +426,7 @@ class Tetromino {
         linesGone+=1;
       }
     }
+    //updates points
     if (linesThisTurn > 0) {
         linesGone += linesThisTurn/2;
         if (linesThisTurn == 1){
@@ -424,7 +442,7 @@ class Tetromino {
           totalPoints += 800; // the classic "Tetris" bonus
         }
 
-    // Increases difficulty: every 5 lines the game goes faster
+    // increases difficulty, every 5 lines the game goes faster
         currentSpeed = max(10, 50 - (linesGone / 5) * 5); 
         this.speed = currentSpeed;
     }
