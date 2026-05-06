@@ -226,8 +226,7 @@ class Tetromino {
       }
     }
   }
-  
-  // Helper to check if a move is valid (defaults to the current piece)
+
   boolean canMove(int newX, int newY) {
     return canMove(newX, newY, this.piece);
   }
