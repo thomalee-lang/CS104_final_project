@@ -262,15 +262,15 @@ class Tetromino {
       boolean full = true;
       for(int c=0; c<10; c++) if (grid.board[r][c] == 0) full = false;
       if (full) {
-        linesThisTurn++;
+        linesThisTurn+=1;
         for (int moveR = r; moveR > 0; moveR--) for (int c = 0; c < 10; c++) grid.board[moveR][c] = grid.board[moveR-1][c];
         for (int c = 0; c < 10; c++) grid.board[0][c] = 0;
-        r++; linesGone++;
+        r++;
         if (linesGone % 3 == 0) currentSpeed = max(5, currentSpeed - 5);
       }
     }
       if (linesThisTurn > 0) {
-        linesGone += linesThisTurn/2;
+        linesGone += linesThisTurn;
         if (linesThisTurn == 1) totalPoints += 100;
         else if (linesThisTurn == 2) totalPoints += 300;
         else if (linesThisTurn == 3) totalPoints += 500;
