@@ -1,11 +1,16 @@
 //global variables
+//global variables
 Grid grid;
 Block b1;
-int screen;
+int screen; // -1: Intro, 0: Home/Instructions, 1: Game
+int subScreen = 0; // 0: Home, 1: Instructions
 Tetromino t;
 int totalPoints;
 int linesGone;
 int currentSpeed;
+
+// Animation Variables
+float introAlpha = 0;
 
 void setup() {
   size(720, 720);
@@ -13,13 +18,19 @@ void setup() {
   grid = new Grid();
   b1 = new Block(int(random(7)), 3, 0);
   t = new Tetromino(b1.shapes[b1.shape], b1.xIndex, b1.yIndex);
-  screen = 0;
+  screen = -1; // Start at Intro Animation
   currentSpeed = 50;
 }
 
 void draw() {
-  if (screen == 0) {
-    showStartScreen();
+  if (screen == -1) {
+    playTeamAnimation();
+  } else if (screen == 0) {
+    if (subScreen == 0) {
+      showStartScreen();
+    } else {
+      showObjectiveScreen();
+    }
   } else if (screen == 1) {
     background(0);
     grid.display();
@@ -28,72 +39,112 @@ void draw() {
   }
 }
 
-// Handles user input
-void keyPressed() {
-  // Start the game when 'S' is pressed
-  if (key == 's' || key == 'S') {
-    screen = 1;
-    rectMode(CORNER);
+// 1. TEAM NAME ANIMATION USING 2D SHAPES
+void playTeamAnimation() {
+  background(0);
+  noStroke();
+  
+  // Decorative shapes representing the "MAL" team
+  fill(30, 230, 220, introAlpha);
+  rect(width/2 - 150, height/2 - 80, 40, 120); // Shape 1
+  fill(140, 25, 180, introAlpha);
+  ellipse(width/2, height/2 - 20, 100, 100);   // Shape 2
+  fill(245, 230, 65, introAlpha);
+  rect(width/2 + 110, height/2 - 80, 40, 120); // Shape 3
+  
+  textAlign(CENTER);
+  fill(255, introAlpha);
+  textSize(60);
+  text("MALfunction", width/2, height/2 + 100);
+  
+  introAlpha += 2;
+  if (introAlpha > 350) { // Stay visible briefly then switch
+    screen = 0;
   }
-  if (screen==1) {
-    if (keyCode==UP) {
-      t.rotation();
+}
+
+// 2. HOME SCREEN
+void showStartScreen() {
+  background(0);
+  textAlign(CENTER);
+  rectMode(CENTER);
+  fill(255);
+  textSize(90);
+  text("TETRIS", width/2, height/2 - 150);
+  stroke(0, 0, 255);
+  strokeWeight(5);
+  fill(0);
+  ellipse(width/2, height/2 - 10, 480, 200);
+  noStroke();
+  fill(255);
+  textSize(60);
+  text("TEAM MAL", width/2, height/2 + 10);
+  fill(150);
+  textSize(25);
+  text("Press 'S' to Continue", width/2, height/2 + 160);
+  strokeWeight(2);
+}
+
+// 3. OBJECTIVE AND INSTRUCTIONS SCREEN
+void showObjectiveScreen() {
+  background(0);
+  textAlign(CENTER);
+  fill(30, 230, 220);
+  textSize(40);
+  text("GAME OBJECTIVE", width/2, height/2 - 200);
+  
+  fill(255);
+  textSize(20);
+  text("Clear horizontal lines by fitting blocks together.\nDon't let the blocks reach the top!", width/2, height/2 - 130);
+  
+  fill(140, 25, 180);
+  textSize(40);
+  text("CONTROLS", width/2, height/2);
+  
+  fill(255);
+  textSize(20);
+  text("ARROW KEYS: Move & Rotate\nDOWN ARROW: Soft Drop\nSPACE BAR: Hard Drop", width/2, height/2 + 60);
+  
+  fill(245, 230, 65);
+  text("Press 'S' to Start Playing", width/2, height/2 + 200);
+}
+
+void keyPressed() {
+  if (key == 's' || key == 'S') {
+    if (screen == 0 && subScreen == 0) {
+      subScreen = 1; // Move from Home to Instructions
+    } else if (screen == 0 && subScreen == 1) {
+      screen = 1;    // Move from Instructions to Game
+      rectMode(CORNER);
     }
-    if (keyCode==DOWN) {
-      t.speed=5;
-    }
-    if (keyCode==LEFT) {
-      t.moveLeft();
-    }
-    if (keyCode==RIGHT) {
-      t.moveRight();
-    }
-    if(key == ' '){
-      t.hardDrop();
-    }
+  }
+  if (screen == 1) {
+    if (keyCode == UP) t.rotation();
+    if (keyCode == DOWN) t.speed = 5;
+    if (keyCode == LEFT) t.moveLeft();
+    if (keyCode == RIGHT) t.moveRight();
+    if (key == ' ') t.hardDrop();
   }
 }
 
 void keyReleased() {
-  if (screen==1) {
+  if (screen == 1) {
     if (keyCode == DOWN || key == ' ') {
-      t.speed=currentSpeed;
+      t.speed = currentSpeed;
     }
   }
 }
 
+// --- REMAINDER OF CLASSES (No logic changes) ---
+
 class Block {
-  int size;
-  int shape;
-  int yPos;
-  int xPos;
-  int xIndex;
-  int yIndex;
-
-  //Pieces Design
-  int[][][] shapes = {
-    { {1, 1, 1}, {0, 1, 0} }, //T
-    { {1, 1, 1, 1} }, //I
-    { {1, 1}, {1, 1} }, // Square
-    { {1, 0, 0}, {1, 1, 1} }, //L
-    { {0, 0, 1}, {1, 1, 1} }, //j
-    { {1, 1, 0}, {0, 1, 1} }, //S
-    { {0, 1, 1}, {1, 1, 0} } // Z
-  };
-
-  color[] colors = {
-    color(140, 25, 180), //T color
-    color(30, 230, 220), //I color
-    color(245, 230, 65), // square color
-    color(20, 95, 245), //L color
-    color(245, 150, 20), //J color
-    color(235, 50, 20), //Z color
-    color(60, 235, 20) //S color
-  };
+  int size; int shape; int yPos; int xPos; int xIndex; int yIndex;
+  int[][][] shapes = {{{1, 1, 1}, {0, 1, 0}}, {{1, 1, 1, 1}}, {{1, 1}, {1, 1}}, {{1, 0, 0}, {1, 1, 1}}, {{0, 0, 1}, {1, 1, 1}}, {{1, 1, 0}, {0, 1, 1}}, {{0, 1, 1}, {1, 1, 0}}};
+  color[] colors = {color(140, 25, 180), color(30, 230, 220), color(245, 230, 65), color(20, 95, 245), color(245, 150, 20), color(235, 50, 20), color(60, 235, 20)};
 
   Block(int shapeIndex, int xIndex, int yIndex) {
     size = grid.w;
-    shape=shapeIndex;
+    shape = shapeIndex;
     this.xIndex = xIndex;
     this.yIndex = yIndex;
   }
@@ -119,38 +170,21 @@ class Block {
   }
 }
 
-
 class Grid {
-  int w; // Width/Height of each square block
-  int cols = 10;
-  int rows = 20;
-  int xOffset;
-  int yOffset;
-  int board[][] = new int[20][10];
-
+  int w; int cols = 10; int rows = 20; int xOffset; int yOffset; int board[][] = new int[20][10];
   Grid() {
-    w = height / 22; // Using 22 to leave not much padding top/bottom
-    // Calculate an offset to center the grid horizontally
+    w = height / 22;
     xOffset = (width - (cols * w)) / 2;
     yOffset = (height - (rows * w)) / 2;
   }
-
   void display() {
-    stroke(155);
-    noFill();
-    // Vertical Lines
-    for (int i = 0; i <= cols; i++) {
-      line(xOffset + i * w, yOffset, xOffset + i * w, yOffset + rows * w);
-    }
-    //  Horizontal Lines
-    for (int j = 0; j <= rows; j++) {
-      line(xOffset, yOffset + j * w, xOffset + cols * w, yOffset + j * w);
-    }
-    
+    stroke(155); noFill();
+    for (int i = 0; i <= cols; i++) line(xOffset + i * w, yOffset, xOffset + i * w, yOffset + rows * w);
+    for (int j = 0; j <= rows; j++) line(xOffset, yOffset + j * w, xOffset + cols * w, yOffset + j * w);
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         if (board[r][c] != 0) {
-          fill(b1.colors[board[r][c]-1]); // Use colors from Block class
+          fill(b1.colors[board[r][c]-1]);
           square(xOffset + c * w, yOffset + r * w, w);
         }
       }
@@ -158,199 +192,64 @@ class Grid {
   }
 }
 
-  // UPDATED: Function to draw the intro menu with ALL Instructions
-  void showStartScreen() {
-    textAlign(CENTER);
-    rectMode(CENTER);
-  
-    // Display the main title
-    background(0);
-    fill(255);
-    textSize(90);
-    text("TETRIS", width/2, height/2 - 150);
-  
-    // Draw the blue logo circle
-    stroke(0, 0, 255);
-    strokeWeight(5);
-    fill(0);
-    ellipse(width/2, height/2 - 10, 480, 200);
-  
-    // Display the team name inside the circle
-    noStroke();
-    fill(255);
-    textSize(30);
-    text("TEAM", width/2, height/2 - 45);
-  
-    textSize(60);
-    text("MALfunction", width/2, height/2 + 30);
-  
-    // Tell the player how to start and instructions
-    strokeWeight(2);
-    fill(150);
-    textSize(20);
-    text("Press 'S' to Start", width/2, height/2 + 150);
-    
-    fill(200);
-    textSize(16);
-    // Added Space bar instructions below
-    text("Controls: Arrows to Move/Rotate\nDown for Soft Drop | Space for Hard Drop", width/2, height/2 + 200);
-  }
-
-
-// determines logic of how the pieces move
 class Tetromino {
-  int[][] piece;
-  int xTopLeftI, yTopLeftI;
-  int speed = 50; //moves every 50 frames
-  boolean collision;
-  int rows;
-  int cols;
-  int[][] rotated;
-
-  Tetromino(int[][] piece, int xTopLeftI, int yTopLeftI) {
-    this.piece = piece;
-    this.xTopLeftI = xTopLeftI;
-    this.yTopLeftI = yTopLeftI;
-  }
-  
-  void moveLeft() {
-    // Just check if moving left by 1 is a valid move
-    if (canMove(xTopLeftI - 1, yTopLeftI)) {
-      xTopLeftI--;
-    }
-  }
-
-  void moveRight() {
-    // Just check if moving right by 1 is a valid move
-    if (canMove(xTopLeftI + 1, yTopLeftI)) {
-      xTopLeftI++;
-    }
-  }
-
+  int[][] piece; int xTopLeftI, yTopLeftI; int speed = 50; int rows; int cols; int[][] rotated;
+  Tetromino(int[][] piece, int xTopLeftI, int yTopLeftI) { this.piece = piece; this.xTopLeftI = xTopLeftI; this.yTopLeftI = yTopLeftI; }
+  void moveLeft() { if (canMove(xTopLeftI - 1, yTopLeftI)) xTopLeftI--; }
+  void moveRight() { if (canMove(xTopLeftI + 1, yTopLeftI)) xTopLeftI++; }
   void moveDown() {
-    int time = (frameCount % speed);
-    if (time == 0) {
-      if (canMove(xTopLeftI, yTopLeftI + 1)) {
-        yTopLeftI += 1;
-      } else {
-        lockPiece(); // Piece has hit something; stop and stack it
-      }
+    if (frameCount % speed == 0) {
+      if (canMove(xTopLeftI, yTopLeftI + 1)) yTopLeftI += 1;
+      else lockPiece();
     }
   }
-  
-  void hardDrop() {
-    while (canMove(xTopLeftI, yTopLeftI + 1)) {
-      yTopLeftI++;
-    }
-    lockPiece();
-  }
-
-  boolean canMove(int newX, int newY) {
-    return canMove(newX, newY, this.piece);
-  }
-  
-  // Advanced helper that can test any matrix (useful for rotations)
+  void hardDrop() { while (canMove(xTopLeftI, yTopLeftI + 1)) yTopLeftI++; lockPiece(); }
+  boolean canMove(int newX, int newY) { return canMove(newX, newY, this.piece); }
   boolean canMove(int newX, int newY, int[][] toTest) {
     for (int r = 0; r < toTest.length; r++) {
       for (int c = 0; c < toTest[r].length; c++) {
         if (toTest[r][c] == 1) {
-          int nextX = newX + c;
-          int nextY = newY + r;
-          // Check boundaries AND landed blocks
-          if (nextX < 0 || nextX >= 10 || nextY >= 20) {
-            return false;
-          }
-          if (nextY >= 0) { 
-            if (grid.board[nextY][nextX] != 0){
-              return false;
-            }
-          }
+          int nextX = newX + c; int nextY = newY + r;
+          if (nextX < 0 || nextX >= 10 || nextY >= 20) return false;
+          if (nextY >= 0 && grid.board[nextY][nextX] != 0) return false;
         }
       }
     }
     return true;
   }
-  
   void lockPiece() {
     for (int r = 0; r < piece.length; r++) {
       for (int c = 0; c < piece[r].length; c++) {
         if (piece[r][c] == 1) {
-          int gridX = xTopLeftI + c;
-          int gridY = yTopLeftI + r;
-          if (gridY >= 0) {
-            grid.board[gridY][gridX] = b1.shape + 1; // Store current color
-          }
+          int gridX = xTopLeftI + c; int gridY = yTopLeftI + r;
+          if (gridY >= 0) grid.board[gridY][gridX] = b1.shape + 1;
         }
       }
     }
-    clearLines();
-    spawnNewPiece();
+    clearLines(); spawnNewPiece();
   }
-  
   void spawnNewPiece() {
-    int newShapeIndex = int(random(7));
-    b1 = new Block(newShapeIndex, 3, 0); 
-    this.piece = b1.shapes[b1.shape];
-    this.xTopLeftI = 3;
-    this.yTopLeftI = 0;
-    
-    // Game Over check: if new piece immediately collides
+    b1 = new Block(int(random(7)), 3, 0);
+    this.piece = b1.shapes[b1.shape]; this.xTopLeftI = 3; this.yTopLeftI = 0;
     if (!canMove(xTopLeftI, yTopLeftI)) {
-      screen = 0; // Return to Start Screen
-      currentSpeed = 50;
-      linesGone = 0;
-      // Reset board
-      for(int i=0; i<20; i++){
-        for(int j=0;j<10; j++){
-          grid.board[i][j]=0;
-        }
-      }
+      screen = 0; subScreen = 0; currentSpeed = 50; linesGone = 0;
+      for(int i=0; i<20; i++) for(int j=0;j<10; j++) grid.board[i][j]=0;
     }
   }
-
   void rotation() {
-    rows = piece.length;
-    cols = piece[0].length;
-    rotated = new int[cols][rows];
-    
-    // Generate the rotated array
-    for (int r = 0; r < rows; r++) {
-      for (int c = 0; c < cols; c++) {
-        rotated[c][rows - 1 - r] = piece[r][c];
-      }
-    }
-    
-    // ONLY apply the rotation if the newly rotated shape fits on the board
-    if (canMove(xTopLeftI, yTopLeftI, rotated)) {
-      piece = rotated;
-    }
+    rows = piece.length; cols = piece[0].length; rotated = new int[cols][rows];
+    for (int r = 0; r < rows; r++) for (int c = 0; c < cols; c++) rotated[c][rows - 1 - r] = piece[r][c];
+    if (canMove(xTopLeftI, yTopLeftI, rotated)) piece = rotated;
   }
-  
-  void clearLines(){
-    for(int r = 19; r>=0; r--){
+  void clearLines() {
+    for(int r = 19; r>=0; r--) {
       boolean full = true;
-      for(int c=0; c<10; c++){
-        if (grid.board[r][c] == 0) {
-          full = false;
-        }
-      }
-      
+      for(int c=0; c<10; c++) if (grid.board[r][c] == 0) full = false;
       if (full) {
-        // Shifts everything above this row down by one
-        for (int moveR = r; moveR > 0; moveR--) {
-          for (int c = 0; c < 10; c++) {
-            grid.board[moveR][c] = grid.board[moveR-1][c];
-          }
-        }
-        // Makes the very top row empty
-        for (int c = 0; c < 10; c++) {
-          grid.board[0][c] = 0;
-        }
-        r++; 
-        linesGone+=1;
-        if (linesGone % 3 == 0) {
-          currentSpeed = max(5, currentSpeed - 5);
-        }
+        for (int moveR = r; moveR > 0; moveR--) for (int c = 0; c < 10; c++) grid.board[moveR][c] = grid.board[moveR-1][c];
+        for (int c = 0; c < 10; c++) grid.board[0][c] = 0;
+        r++; linesGone++;
+        if (linesGone % 3 == 0) currentSpeed = max(5, currentSpeed - 5);
       }
     }
   }
