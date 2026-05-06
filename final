@@ -3,6 +3,8 @@ Grid grid;
 Block b1;
 int screen;
 Tetromino t;
+int totalPoints;
+int linesGone;
 
 void setup() {
   size(720, 720);
@@ -266,6 +268,7 @@ class Tetromino {
         }
       }
     }
+    clearLines();
     spawnNewPiece();
   }
   
@@ -296,6 +299,32 @@ class Tetromino {
     // ONLY apply the rotation if the newly rotated shape fits on the board
     if (canMove(xTopLeftI, yTopLeftI, rotated)) {
       piece = rotated;
+    }
+  }
+  
+  void clearLines(){
+    for(int r = 19; r>=0; r--){
+      boolean full = true;
+      for(int c=0; c<10; c++){
+        if (grid.board[r][c] == 0) {
+          full = false;
+        }
+      }
+      
+      if (full) {
+        // Shift everything above this row down by one
+        for (int moveR = r; moveR > 0; moveR--) {
+          for (int c = 0; c < 10; c++) {
+            grid.board[moveR][c] = grid.board[moveR-1][c];
+          }
+        }
+        // Make the very top row empty
+        for (int c = 0; c < 10; c++) {
+          grid.board[0][c] = 0;
+        }
+        // Re-check the same row index because a new row just moved into it
+        r++; 
+      }
     }
   }
 }
