@@ -158,7 +158,7 @@ class Grid {
   }
 }
 
-  // UPDATED: Function to draw the intro menu with Instructions
+  // UPDATED: Function to draw the intro menu with ALL Instructions
   void showStartScreen() {
     textAlign(CENTER);
     rectMode(CENTER);
@@ -192,7 +192,8 @@ class Grid {
     
     fill(200);
     textSize(16);
-    text("Controls: Arrows to Move & Rotate\nDown Arrow to increase speed", width/2, height/2 + 200);
+    // Added Space bar instructions below
+    text("Controls: Arrows to Move/Rotate\nDown for Soft Drop | Space for Hard Drop", width/2, height/2 + 200);
   }
 
 
@@ -286,7 +287,6 @@ class Tetromino {
     spawnNewPiece();
   }
   
-  // UPDATED: Spawns new piece and handles Game Over cycle
   void spawnNewPiece() {
     int newShapeIndex = int(random(7));
     b1 = new Block(newShapeIndex, 3, 0); 
