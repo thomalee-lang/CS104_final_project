@@ -25,7 +25,6 @@ void draw() {
     grid.display();
     b1.render();
     b1.update(t);
-    println(currentSpeed);
   }
 }
 
@@ -100,14 +99,13 @@ class Block {
   }
 
   void render() {
-    xPos = 200 + xIndex*size;
-    yPos = 40 + yIndex*size;
+    xPos = grid.xOffset + xIndex*size;
+    yPos = grid.yOffset + yIndex*size;
     for (int i=0; i<shapes[shape].length; i++) {
       for (int j=0; j<shapes[shape][i].length; j++) {
         if (shapes[shape][i][j] == 1) {
           fill(colors[shape]);
           square(j*size + xPos, i*size + yPos, size);
-        } else if (shapes[shape][i][j] == 0) {
         }
       }
     }
@@ -148,7 +146,7 @@ class Grid {
     for (int j = 0; j <= rows; j++) {
       line(xOffset, yOffset + j * w, xOffset + cols * w, yOffset + j * w);
     }
-   
+    
     for (int r = 0; r < rows; r++) {
       for (int c = 0; c < cols; c++) {
         if (board[r][c] != 0) {
@@ -160,7 +158,7 @@ class Grid {
   }
 }
 
-  // Function to draw the intro menu
+  // UPDATED: Function to draw the intro menu with Instructions
   void showStartScreen() {
     textAlign(CENTER);
     rectMode(CENTER);
@@ -186,11 +184,15 @@ class Grid {
     textSize(60);
     text("MALfunction", width/2, height/2 + 30);
   
-    // Tell the player how to start
+    // Tell the player how to start and instructions
     strokeWeight(2);
     fill(150);
     textSize(20);
-    text("Press 'S' to Start", width/2, height/2 + 160);
+    text("Press 'S' to Start", width/2, height/2 + 150);
+    
+    fill(200);
+    textSize(16);
+    text("Controls: Arrows to Move & Rotate\nDown Arrow to increase speed", width/2, height/2 + 200);
   }
 
 
@@ -284,22 +286,25 @@ class Tetromino {
     spawnNewPiece();
   }
   
+  // UPDATED: Spawns new piece and handles Game Over cycle
   void spawnNewPiece() {
-    b1 = new Block(int(random(7)), 3, -1); // New random shape
+    int newShapeIndex = int(random(7));
+    b1 = new Block(newShapeIndex, 3, 0); 
     this.piece = b1.shapes[b1.shape];
     this.xTopLeftI = 3;
-    this.yTopLeftI = -1;
+    this.yTopLeftI = 0;
     
     // Game Over check: if new piece immediately collides
     if (!canMove(xTopLeftI, yTopLeftI)) {
-      screen = 0;
-      //reset board
+      screen = 0; // Return to Start Screen
+      currentSpeed = 50;
+      linesGone = 0;
+      // Reset board
       for(int i=0; i<20; i++){
         for(int j=0;j<10; j++){
           grid.board[i][j]=0;
         }
       }
-      currentSpeed = 50;
     }
   }
 
