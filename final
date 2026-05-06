@@ -25,6 +25,7 @@ void draw() {
     grid.display();
     b1.render();
     b1.update(t);
+    println(currentSpeed);
   }
 }
 
@@ -298,6 +299,7 @@ class Tetromino {
           grid.board[i][j]=0;
         }
       }
+      currentSpeed = 50;
     }
   }
 
@@ -340,6 +342,10 @@ class Tetromino {
           grid.board[0][c] = 0;
         }
         r++; 
+        linesGone+=1;
+        if (linesGone % 3 == 0) {
+          currentSpeed = max(5, currentSpeed - 5);
+        }
       }
     }
   }
